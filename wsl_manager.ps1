@@ -22,6 +22,16 @@ function WSL-Checker {
     $global:is_any_distro = $LastExitCode
 }
 
+function Script-Creator($NEW_USER) {
+@"
+#!/bin/bash
+useradd -m -G sudo -s /bin/bash $NEW_USER
+passwd '$NEW_USER'
+echo -e '[user]\ndefault'"=$NEW_USER" > /etc/wsl.conf
+# echo 'default=$NEW_USER' >> /etc/wsl.conf
+"@ | Out-File -FilePath "temp_script.sh"
+}
+
 # Checking the WSL & Distros
 WSL-Checker
 if ($is_wsl_installed -ne 0){
@@ -125,6 +135,15 @@ if ($is_wsl_installed -eq '0'){
             Write-Host "Importing the image..."
             wsl --import $name "$path" wsl_image.tar.gz
             rm wsl_image.tar.gz
+            Write-Host "`n`nConfiguring default account in the $name distro: "
+            $NEW_USER = Read-Host "Provide username"
+            Script-Creator $NEW_USER # Create and run script for username configuration
+            $handle_script = Get-Content -Raw ./temp_script.sh
+            wsl -d $name bash -c ($handle_script -replace '"', '\"')
+            Write-Host "Username $NEW_USER configured and set as default user. Restarting $name WSL. . ."
+            wsl --terminate $name
+            rm "temp_script.sh"
+            Start-Sleep -Seconds 2
         }
         if ($menu -eq '3'){
             if ($is_any_distro -eq '0'){
