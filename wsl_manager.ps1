@@ -112,7 +112,7 @@ if ($is_wsl_installed -eq '0'){
                 $image_menu = Read-Host "Default image (d) / Custom image link (l)"
                 # Default Ubuntu
                 if ($image_menu -eq 'd'){
-                    $image_url = 'https://cloud-images.ubuntu.com/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz'
+                    $image_url = 'https://cloud-images.ubuntu.com/wsl/jammy/current/ubuntu-jammy-wsl-amd64-ubuntu22.04lts.rootfs.tar.gz'
                     break
                 }
                 # Custom image
